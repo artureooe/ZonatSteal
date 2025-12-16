@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: stelzon-panel
+    env: python
+    region: frankfurt  # или oregon/singapore
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: stelzon-db
+          property: connectionString
+    buildCommand: ./build.sh
+    startCommand: gunicorn --worker-class eventlet -w 1 wsgi:app --bind 0.0.0.0:$PORT --timeout 120
+    autoDeploy: true
+
+databases:
+  - name: stelzon-db
+    plan: free
+    databaseName: stelzon
+    user: stelzon_user
+    region: frankfurt
